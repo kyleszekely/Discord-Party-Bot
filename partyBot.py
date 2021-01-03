@@ -1,42 +1,45 @@
-#import Discord Package
+import json
 import discord
 from discord.ext import commands
 
-#the bot
+with open('token.json', "r") as f:
+    data = json.load(f) 
+print(data.get('TOKEN'))
+
+TOKEN = data.get('TOKEN')
+
 client = commands.Bot(command_prefix="#")
 
 playerNumber = 0
 
-#when #play
 @client.command(name="play")
 async def play(context, *game):
 
-
     myEmbed = discord.Embed(title=" ".join(game), description="React to join the Game Party", color=0xFF69B4)
-    myEmbed.add_field(name="Lobby:", value="TBD", inline=False)
-    myEmbed.add_field(name="Players:", value=playerNumber, inline=False)
-    myEmbed.set_footer(text="This is a sample footer")
+    myEmbed.add_field(name="Lobby:", value="TBD", inline=True)
+    myEmbed.add_field(name="Players:", value=playerNumber, inline=True)
+    myEmbed.set_footer(text=" ")
     myEmbed.set_author(name="Hosted by: {}".format(context.author))
 
-    await context.message.channel.send(embed=myEmbed)
+    message = await context.message.channel.send(embed=myEmbed)
+    await context.message.delete()
+    await message.add_reaction("🚀")
 
 @client.event
 async def on_reaction_add(reaction, user):
     global playerNumber
-    if reaction == str(":rocket:"):
+    if reaction.emoji == "🚀":
         users = await reaction.users().flatten()
         playerNumber = len(users)
-        print(len(users))
-        print(reaction)
-    #print(reaction)
+        print(reaction.message)
+        #reaction.message.edit(embed = newEmbed)
+        print("List of Users that reacted: {}".format(len(users)))
+        print(users)
 
-#on startup
 @client.event
 async def on_ready():
-    print("Bot is online")
-    general_channel = client.get_channel(794685678453391383)
-    await general_channel.send("Bonjour! :partying_face:")
+    print("Bot is online.")
 
 
-#run the client on the server
-client.run("Nzk0NjgyMTQ3NjQxNzUzNjAw.X--XbA.DG7MTdVTRpei8HhCar4RGhWnmk4")
+client.run(TOKEN)
+
