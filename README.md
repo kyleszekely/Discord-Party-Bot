@@ -5,4 +5,4 @@
 - Use commands in a discord text channel to create an embed message from a bot :robot: 
 - React to the embed to join the party :fireworks: 
 
-Peer evaluated by: [naek](https://naek.ca/)
+Peer reviewed by: [naek](https://naek.ca/)
