@@ -12,29 +12,51 @@ client = commands.Bot(command_prefix="#")
 
 playerNumber = 0
 
+dictionary = {}
+
 @client.command(name="play")
 async def play(context, *game):
 
+    global dictionary
+
     myEmbed = discord.Embed(title=" ".join(game), description="React to join the Game Party", color=0xFF69B4)
     myEmbed.add_field(name="Lobby:", value="TBD", inline=True)
-    myEmbed.add_field(name="Players:", value=playerNumber, inline=True)
+    myEmbed.add_field(name="Players:", value="TBD", inline=True)
     myEmbed.set_footer(text=" ")
-    myEmbed.set_author(name="Hosted by: {}".format(context.author))
+    myEmbed.set_author(name="Hosted by: {}".format(context.author), icon_url=context.author.avatar_url)
 
     message = await context.message.channel.send(embed=myEmbed)
+    dictionary.update({message.id: myEmbed})
+    
     await context.message.delete()
     await message.add_reaction("🚀")
+       
 
 @client.event
 async def on_reaction_add(reaction, user):
     global playerNumber
-    if reaction.emoji == "🚀":
-        users = await reaction.users().flatten()
-        playerNumber = len(users)
-        print(reaction.message)
-        #reaction.message.edit(embed = newEmbed)
-        print("List of Users that reacted: {}".format(len(users)))
-        print(users)
+   
+    if dictionary.get(reaction.message.id):
+        if reaction.emoji == "🚀":
+           
+            users = await reaction.users().flatten()
+            playerNumber = (len(users))-1
+
+            updatedEmbed = dictionary.get(reaction.message.id).set_field_at(1, name="Players:", value="\n".join([user.name for user in users if user.name != "PartyBot"]), inline=True)
+            await reaction.message.edit(embed=updatedEmbed)
+
+@client.event
+async def on_reaction_remove(reaction, user):
+    
+    if dictionary.get(reaction.message.id):
+        if reaction.emoji == "🚀":
+
+            users = await reaction.users().flatten()
+
+            print(users)
+
+            #updatedEmbed = dictionary.get(reaction.message.id).set_field_at(1, name="Players:", value="\n".join([user.name for user in users if user.name != "PartyBot"]), inline=True)
+            #await reaction.message.edit(embed=updatedEmbed)
 
 @client.event
 async def on_ready():
