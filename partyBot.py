@@ -38,25 +38,40 @@ async def on_reaction_add(reaction, user):
    
     if dictionary.get(reaction.message.id):
         if reaction.emoji == "🚀":
-           
-            users = await reaction.users().flatten()
-            playerNumber = (len(users))-1
+            
+            if not user.bot:
+            
+                users = await reaction.users().flatten()
 
-            updatedEmbed = dictionary.get(reaction.message.id).set_field_at(1, name="Players:", value="\n".join([user.name for user in users if user.name != "PartyBot"]), inline=True)
-            await reaction.message.edit(embed=updatedEmbed)
+                print("React: {}".format(users))
+                
+                playerNumber = (len(users))-1
+           
+                updatedEmbed = dictionary.get(reaction.message.id).set_field_at(1 , name="Players:", value='\u200b\n'.join([user.name for user in users if user.name != "PartyBot"]), inline=True)
+                await reaction.message.edit(embed=updatedEmbed)
+               
 
 @client.event
 async def on_reaction_remove(reaction, user):
-    
+
+    print("hello")
+
     if dictionary.get(reaction.message.id):
+        print("Test1")
         if reaction.emoji == "🚀":
+            print("test2")
+            if not user.bot:
+                
+                users = await reaction.users().flatten()
 
-            users = await reaction.users().flatten()
+                print("Unreact: {}".format(users))
+                
+                playerNumber -= 1
 
-            print(users)
-
-            #updatedEmbed = dictionary.get(reaction.message.id).set_field_at(1, name="Players:", value="\n".join([user.name for user in users if user.name != "PartyBot"]), inline=True)
-            #await reaction.message.edit(embed=updatedEmbed)
+                print(playerNumber)
+           
+                updatedEmbed = dictionary.get(reaction.message.id).set_field_at(1 , name="Players:", value='\u200b\n'.join([user.name for user in users if user.name != "PartyBot"]), inline=True)
+                await reaction.message.edit(embed=updatedEmbed)
 
 @client.event
 async def on_ready():
